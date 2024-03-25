@@ -57,7 +57,11 @@ class DietListTile extends StatefulWidget {
   final String desc;
 
   @override
-  State<StatefulWidget> createState() => _DietListTileState();
+  State<StatefulWidget> createState() {
+    print(name);
+    // TODO: 这里加个数据库
+    return _DietListTileState();
+  }
 }
 
 class _DietListTileState extends State<DietListTile> {
@@ -67,13 +71,22 @@ class _DietListTileState extends State<DietListTile> {
     setState(() {
       int delta = (percent * 100).ceil();
       _targetPercent = min(_targetPercent + delta, 100);
+      _targetPercent = max(_targetPercent, 0);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-        leading: Text("$_targetPercent%"),
+        leading: TextButton(
+          onPressed: () {
+            _increaseTarget(-1);
+          },
+          child: Text("$_targetPercent%", ),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
         title: Text(widget.name),
         subtitle: Text(widget.desc),
         trailing: Row(mainAxisSize: MainAxisSize.min, children: [
