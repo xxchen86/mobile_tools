@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_tools/DiatPage.dart';
+import 'package:mobile_tools/DietPage.dart';
 
 void main() {
   runApp(const MyApp());
