@@ -26,6 +26,24 @@ class DietModel extends ChangeNotifier {
     return DateTime.now().toString().split(" ")[0];
   }
 
+  String getYesterday(String today) {
+    return DateTime.parse(today)
+        .subtract(const Duration(days: 1))
+        .toString()
+        .split(" ")[0];
+  }
+
+  List<String> getLastSevenDates() {
+    var now = getNowDate();
+    var days = <String>[now];
+    for (int i = 0; i < 6; ++i) {
+      var yesterday = getYesterday(now);
+      days.add(yesterday);
+      now = yesterday;
+    }
+    return days;
+  }
+
   void update(String name, DietRecord record) {
     _repository.update(record).whenComplete(() {
       _records[name] = record;

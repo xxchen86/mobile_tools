@@ -11,22 +11,29 @@ class DietPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Diet Page"),
-      ),
-      body: Center(
-          child: ChangeNotifierProvider(
-        create: (context) => DietModel(),
-        child: ListView.builder(
+    return ChangeNotifierProvider(
+      create: (context) => DietModel(),
+      child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            title: Consumer<DietModel>(
+              builder: (context, diet, child) => DropdownMenu(
+                dropdownMenuEntries: diet
+                    .getLastSevenDates()
+                    .map((e) => DropdownMenuEntry(value: e, label: e))
+                    .toList(),
+                initialSelection: diet.getNowDate(),
+              ),
+            )),
+        body: Center(
+            child: ListView.builder(
           itemCount: DietFood.fullList.length,
           itemBuilder: (context, index) {
             var food = DietFood.fullList[index];
             return DietListTile(name: food.name, desc: food.desc);
           },
-        ),
-      )),
+        )),
+      ),
     );
   }
 }
