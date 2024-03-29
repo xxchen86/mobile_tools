@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mobile_tools/DietModel.dart';
+import 'package:mobile_tools/diet_model.dart';
 import 'package:provider/provider.dart';
 
-import 'DietFood.dart';
+import 'diet_food.dart';
 
 class DietPage extends StatelessWidget {
   const DietPage({super.key});

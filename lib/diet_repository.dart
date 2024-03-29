@@ -1,4 +1,4 @@
-import 'package:mobile_tools/DietFood.dart';
+import 'package:mobile_tools/diet_food.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 

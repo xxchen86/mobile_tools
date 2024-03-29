@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import 'DietRepository.dart';
+import 'diet_repository.dart';
 
 class DietModel extends ChangeNotifier {
   final _repository = DatabaseDietRepository();
