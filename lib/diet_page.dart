@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_tools/diet_model.dart';
 import 'package:provider/provider.dart';
 
+import 'date.dart';
 import 'diet_food.dart';
 
 class DietPage extends StatelessWidget {
@@ -15,16 +16,21 @@ class DietPage extends StatelessWidget {
       create: (context) => DietModel(),
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Consumer<DietModel>(
-              builder: (context, diet, child) => DropdownMenu(
-                dropdownMenuEntries: diet
-                    .getLastSevenDates()
-                    .map((e) => DropdownMenuEntry(value: e, label: e))
-                    .toList(),
-                initialSelection: diet.getNowDate(),
-              ),
-            )),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Consumer<DietModel>(
+            builder: (context, diet, child) => DropdownMenu(
+              dropdownMenuEntries: Date.now()
+                  .lastSevenDays()
+                  .map((e) => DropdownMenuEntry(
+                      value: e.toString(), label: e.toString()))
+                  .toList(),
+              initialSelection: Date.now().toString(),
+              onSelected: (String? selected) {
+                diet.date = Date.parse(selected!);
+              },
+            ),
+          ),
+        ),
         body: Center(
             child: ListView.builder(
           itemCount: DietFood.fullList.length,
@@ -38,19 +44,12 @@ class DietPage extends StatelessWidget {
   }
 }
 
-class DietListTile extends StatefulWidget {
+class DietListTile extends StatelessWidget {
   const DietListTile({super.key, required this.name, required this.desc});
 
   final String name;
   final String desc;
 
-  @override
-  State<StatefulWidget> createState() {
-    return _DietListTileState();
-  }
-}
-
-class _DietListTileState extends State<DietListTile> {
   int _getIncreasedTarget(int base, double percent) {
     int delta = (percent * 100).ceil();
     base = min(base + delta, 100);
@@ -62,13 +61,13 @@ class _DietListTileState extends State<DietListTile> {
   Widget build(BuildContext context) {
     return Consumer<DietModel>(
       builder: (context, diet, child) {
-        var record = diet.records[widget.name];
+        var record = diet.records[name];
         var percent = record?.percent;
         return ListTile(
             leading: TextButton(
               onPressed: () {
                 if (record != null && percent != null) {
-                  diet.update(widget.name,
+                  diet.update(name,
                       record.copyWith(_getIncreasedTarget(percent, -1)));
                 }
               },
@@ -79,13 +78,13 @@ class _DietListTileState extends State<DietListTile> {
                 percent != null ? "$percent%" : "—",
               ),
             ),
-            title: Text(widget.name),
-            subtitle: Text(widget.desc),
+            title: Text(name),
+            subtitle: Text(desc),
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               TextButton(
                 onPressed: () {
                   if (record != null && percent != null) {
-                    diet.update(widget.name,
+                    diet.update(name,
                         record.copyWith(_getIncreasedTarget(percent, 1)));
                   }
                 },
@@ -94,7 +93,7 @@ class _DietListTileState extends State<DietListTile> {
               TextButton(
                 onPressed: () {
                   if (record != null && percent != null) {
-                    diet.update(widget.name,
+                    diet.update(name,
                         record.copyWith(_getIncreasedTarget(percent, 1 / 2)));
                   }
                 },
@@ -103,7 +102,7 @@ class _DietListTileState extends State<DietListTile> {
               TextButton(
                 onPressed: () {
                   if (record != null && percent != null) {
-                    diet.update(widget.name,
+                    diet.update(name,
                         record.copyWith(_getIncreasedTarget(percent, 1 / 3)));
                   }
                 },
