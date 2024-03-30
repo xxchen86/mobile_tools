@@ -21,6 +21,10 @@ class DietPage extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Consumer<DietModel>(
             builder: (context, diet, child) => DropdownMenu(
+              inputDecorationTheme: const InputDecorationTheme(
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(style: BorderStyle.none)),
+              ),
               dropdownMenuEntries: Date.now()
                   .lastSevenDays()
                   .map((e) => DropdownMenuEntry(
