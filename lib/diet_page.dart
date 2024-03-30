@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mobile_tools/diet_model.dart';
 import 'package:provider/provider.dart';
 
@@ -63,52 +65,76 @@ class DietListTile extends StatelessWidget {
       builder: (context, diet, child) {
         var record = diet.records[name];
         var percent = record?.percent;
-        return ListTile(
-            leading: TextButton(
-              onPressed: () {
-                if (record != null && percent != null) {
-                  diet.update(name,
-                      record.copyWith(_getIncreasedTarget(percent, -1)));
-                }
-              },
+        return TextButtonTheme(
+          data: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8))),
+          child: ListTile(
+              leading: SizedBox(
+                width: 52,
+                child: TextButton(
+                  onPressed: () {
+                    if (record != null && percent != null) {
+                      diet.update(name,
+                          record.copyWith(_getIncreasedTarget(percent, -1)));
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.onSurface),
+                  child: Text(
+                    percent != null ? "$percent%" : "—",
+                  ),
+                ),
               ),
-              child: Text(
-                percent != null ? "$percent%" : "—",
-              ),
-            ),
-            title: Text(name),
-            subtitle: Text(desc),
-            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-              TextButton(
-                onPressed: () {
-                  if (record != null && percent != null) {
-                    diet.update(name,
-                        record.copyWith(_getIncreasedTarget(percent, 1)));
-                  }
-                },
-                child: const Text("1"),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (record != null && percent != null) {
-                    diet.update(name,
-                        record.copyWith(_getIncreasedTarget(percent, 1 / 2)));
-                  }
-                },
-                child: const Text("1/2"),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (record != null && percent != null) {
-                    diet.update(name,
-                        record.copyWith(_getIncreasedTarget(percent, 1 / 3)));
-                  }
-                },
-                child: const Text("1/3"),
-              ),
-            ]));
+              title: Text(name),
+              subtitle: Text(desc),
+              trailing: SizedBox(
+                width: 150,
+                child: Row(children: [
+                  Expanded(
+                    flex: 1,
+                    child: TextButton(
+                      onPressed: () {
+                        if (record != null && percent != null) {
+                          diet.update(name,
+                              record.copyWith(_getIncreasedTarget(percent, 1)));
+                        }
+                      },
+                      child: const Text("1"),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: TextButton(
+                      onPressed: () {
+                        if (record != null && percent != null) {
+                          diet.update(
+                              name,
+                              record.copyWith(
+                                  _getIncreasedTarget(percent, 1 / 2)));
+                        }
+                      },
+                      child: const Text("1/2"),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: TextButton(
+                      onPressed: () {
+                        if (record != null && percent != null) {
+                          diet.update(
+                              name,
+                              record.copyWith(
+                                  _getIncreasedTarget(percent, 1 / 3)));
+                        }
+                      },
+                      child: const Text("1/3"),
+                    ),
+                  ),
+                ]),
+              )),
+        );
       },
     );
   }
