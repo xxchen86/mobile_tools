@@ -81,7 +81,7 @@ class DietStatisticBody extends StatefulWidget {
 
 class _DietStatisticBodyState extends State<DietStatisticBody> {
   var _todayTotalPercent = 0;
-  var _weekTotalPercent = <int>[];
+  var _weekTotalPercent = <int, int>{};
   var _foodMeanPercent = <DietFood, int>{};
 
   _DietStatisticBodyState() {
@@ -118,8 +118,8 @@ class _DietStatisticBodyState extends State<DietStatisticBody> {
         children: [
           Text("今日达成情况：$_todayTotalPercent%"),
         ]
-            .followedBy(_weekTotalPercent.indexed
-                .map((e) => Text("周${e.$1 + 1}达成情况：${e.$2}%")))
+            .followedBy(_weekTotalPercent.entries
+                .map((e) => Text("周${e.key}达成情况：${e.value}%")))
             .followedBy(_foodMeanPercent.entries
                 .map((e) => Text("本周${e.key.name}平均达成情况：${e.value}%")))
             .toList(),

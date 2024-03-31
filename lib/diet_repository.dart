@@ -92,13 +92,15 @@ class DatabaseDietRepository {
             records.length;
   }
 
-  Future<List<int>> totalPercentThroughWeek(Date oneDateInWeek) async {
+  Future<Map<int, int>> totalPercentThroughWeek(Date oneDateInWeek) async {
     await _connectIfNot();
-    var res = <int>[];
+    var res = <int, int>{};
+    var weekday = 0;
     for (var date in oneDateInWeek.daysInWeek()) {
+      weekday++;
       var p = await totalPercentOfDay(date);
       if (p != null) {
-        res.add(p);
+        res[weekday] = p;
       }
     }
     return res;
