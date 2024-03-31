@@ -15,4 +15,15 @@ class DietFood {
     DietFood("全谷物和杂豆", "50-150g"),
     DietFood("薯类", "50-100g"),
   ]);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DietFood &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          desc == other.desc;
+
+  @override
+  int get hashCode => name.hashCode ^ desc.hashCode;
 }

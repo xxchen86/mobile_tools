@@ -21,6 +21,14 @@ class Date {
     return res;
   }
 
+  List<Date> daysInWeek() {
+    var res = <Date>[];
+    for(var i = _dateTime.weekday - 1;i >= 0; --i) {
+      res.add(_dateTime.subtract(Duration(days: i)).toDate());
+    }
+    return res;
+  }
+
   Date yesterday() {
     return _dateTime.subtract(const Duration(days: 1)).toDate();
   }

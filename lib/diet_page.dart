@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_tools/diet_model.dart';
+import 'package:mobile_tools/diet_repository.dart';
 import 'package:provider/provider.dart';
 
 import 'date.dart';
@@ -32,7 +33,8 @@ class _DietPageState extends State<DietPage> {
                     borderSide: BorderSide(style: BorderStyle.none)),
               ),
               dropdownMenuEntries: Date.now()
-                  .lastSevenDays()
+                  .daysInWeek()
+                  .reversed
                   .map((e) => DropdownMenuEntry(
                       value: e.toString(), label: e.toString()))
                   .toList(),
@@ -45,7 +47,7 @@ class _DietPageState extends State<DietPage> {
         ),
         body: _bottomNavigationIndex == 0
             ? const DietRecordBody()
-            : const Center(child: Text("开发中")),
+            : const DietStatisticBody(),
         bottomNavigationBar: BottomNavigationBar(
           onTap: (index) {
             setState(() {
@@ -64,6 +66,62 @@ class _DietPageState extends State<DietPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DietStatisticBody extends StatefulWidget {
+  const DietStatisticBody({super.key});
+
+  @override
+  State<DietStatisticBody> createState() => _DietStatisticBodyState();
+}
+
+class _DietStatisticBodyState extends State<DietStatisticBody> {
+  var _todayTotalPercent = 0;
+  var _weekTotalPercent = <int>[];
+  var _foodMeanPercent = <DietFood, int>{};
+
+  _DietStatisticBodyState() {
+    var db = DatabaseDietRepository();
+    var today = Date.now().toString();
+    db.totalPercentOfDay(today).then((value) => setState(() {
+          _todayTotalPercent = value!;
+        }));
+    db.totalPercentThroughWeek(today).then((value) => setState(() {
+          _weekTotalPercent = value;
+        }));
+    db.percentOfFoodThroughWeek(today).then((value) => setState(() {
+          _foodMeanPercent = value;
+        }));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // return Center(
+    //   child: SizedBox(
+    //     height: 500,
+    //     child: BarChart(
+    //       BarChartData(barGroups: [
+    //         BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 100)]),
+    //         BarChartGroupData(x: 2),
+    //         BarChartGroupData(x: 3),
+    //       ]),
+    //     ),
+    //   ),
+    // );
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("今日达成情况：$_todayTotalPercent%"),
+        ]
+            .followedBy(_weekTotalPercent.indexed
+                .map((e) => Text("周${e.$1 + 1}达成情况：${e.$2}%")))
+            .followedBy(_foodMeanPercent.entries
+                .map((e) => Text("本周${e.key.name}平均达成情况：${e.value}%")))
+            .toList(),
       ),
     );
   }
@@ -162,7 +220,7 @@ class DietListTile extends StatelessWidget {
                                         _getIncreasedTarget(percent, 1)));
                               }
                             },
-                      child: Text("1"),
+                      child: const Text("1"),
                     ),
                   ),
                   Expanded(
