@@ -28,6 +28,7 @@ class _DietPageState extends State<DietPage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Consumer<DietModel>(
             builder: (context, diet, child) => DropdownMenu(
+              enabled: _bottomNavigationIndex == 0,
               inputDecorationTheme: const InputDecorationTheme(
                 enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(style: BorderStyle.none)),
@@ -40,7 +41,7 @@ class _DietPageState extends State<DietPage> {
                   .toList(),
               initialSelection: Date.now().toString(),
               onSelected: (String? selected) {
-                diet.date = Date.parse(selected!);
+                diet.setDate(Date.parse(selected!));
               },
             ),
           ),
@@ -85,7 +86,7 @@ class _DietStatisticBodyState extends State<DietStatisticBody> {
 
   _DietStatisticBodyState() {
     var db = DatabaseDietRepository();
-    var today = Date.now().toString();
+    var today = Date.now();
     db.totalPercentOfDay(today).then((value) => setState(() {
           _todayTotalPercent = value!;
         }));

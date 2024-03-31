@@ -53,14 +53,14 @@ class DatabaseDietRepository {
     }
   }
 
-  Future<List<DietRecord>> getRecords(String date) async {
+  Future<List<DietRecord>> getRecords(Date date) async {
     await _connectIfNot();
-    var listOfMap =
-        await _db!.query("diet", where: "date = ?", whereArgs: [date]);
-    if (listOfMap.isEmpty && date == Date.now().toString()) {
+    var listOfMap = await _db!
+        .query("diet", where: "date = ?", whereArgs: [date.toString()]);
+    if (listOfMap.isEmpty && date == Date.now()) {
       await _initDailyRecords();
-      listOfMap =
-          await _db!.query("diet", where: "date = ?", whereArgs: [date]);
+      listOfMap = await _db!
+          .query("diet", where: "date = ?", whereArgs: [date.toString()]);
     }
     print(listOfMap);
     var res = <DietRecord>[];
@@ -81,7 +81,7 @@ class DatabaseDietRepository {
     return true;
   }
 
-  Future<int?> totalPercentOfDay(String date) async {
+  Future<int?> totalPercentOfDay(Date date) async {
     await _connectIfNot();
     var records = await getRecords(date);
     return records.isEmpty
@@ -92,11 +92,11 @@ class DatabaseDietRepository {
             records.length;
   }
 
-  Future<List<int>> totalPercentThroughWeek(String oneDateInWeek) async {
+  Future<List<int>> totalPercentThroughWeek(Date oneDateInWeek) async {
     await _connectIfNot();
     var res = <int>[];
-    for (var date in Date.parse(oneDateInWeek).daysInWeek()) {
-      var p = await totalPercentOfDay(date.toString());
+    for (var date in oneDateInWeek.daysInWeek()) {
+      var p = await totalPercentOfDay(date);
       if (p != null) {
         res.add(p);
       }
@@ -105,21 +105,22 @@ class DatabaseDietRepository {
   }
 
   Future<Map<DietFood, int>> percentOfFoodThroughWeek(
-      String oneDateInWeek) async {
+      Date oneDateInWeek) async {
     await _connectIfNot();
     var recordsThroughWeek = <List<DietRecord>>[];
-    for (var date in Date.parse(oneDateInWeek).daysInWeek()) {
-      recordsThroughWeek.add(await getRecords(date.toString()));
+    for (var date in oneDateInWeek.daysInWeek()) {
+      recordsThroughWeek.add(await getRecords(date));
     }
     var res = <DietFood, int>{};
     for (var food in DietFood.fullList) {
       var sum = 0;
       var count = 0;
-      for(var oneDayRecords in recordsThroughWeek) {
-        if(oneDayRecords.isEmpty) {
+      for (var oneDayRecords in recordsThroughWeek) {
+        if (oneDayRecords.isEmpty) {
           continue;
         }
-        var r = oneDayRecords.firstWhere((element) => element.foodName == food.name);
+        var r = oneDayRecords
+            .firstWhere((element) => element.foodName == food.name);
         sum += r.percent;
         count++;
       }

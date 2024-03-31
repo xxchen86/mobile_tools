@@ -7,29 +7,27 @@ import 'diet_repository.dart';
 
 class DietModel extends ChangeNotifier {
   final _repository = DatabaseDietRepository();
-
   final _records = <String, DietRecord>{};
-
   Date _date = Date.now();
 
-  set date(Date value) {
-    _date = value;
+  DietModel() {
     _updateDateRecords();
   }
-
-  Date get date => _date;
 
   UnmodifiableMapView<String, DietRecord> get records =>
       UnmodifiableMapView(_records);
 
-  DietModel() {
+  Date get date => _date;
+
+  setDate(Date date) {
+    _date = date;
     _updateDateRecords();
   }
 
   _updateDateRecords() {
     print("change to $_date");
     _records.clear();
-    _repository.getRecords(_date.toString()).then((records) {
+    _repository.getRecords(_date).then((records) {
       for (var record in records) {
         _records[record.foodName] = record;
       }
@@ -42,6 +40,4 @@ class DietModel extends ChangeNotifier {
       notifyListeners();
     });
   }
-
-
 }
