@@ -37,4 +37,14 @@ class Date {
   String toString() {
     return _dateTime.toString().split(" ").first;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Date &&
+          runtimeType == other.runtimeType &&
+          toString() == other.toString();
+
+  @override
+  int get hashCode => _dateTime.hashCode;
 }

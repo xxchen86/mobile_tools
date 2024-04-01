@@ -28,6 +28,9 @@ class DatabaseDietRepository {
   static Database? _db;
 
   _connectIfNot() async {
+    if (_db != null) {
+      return;
+    }
     _db = await openDatabase(join(await getDatabasesPath(), 'diet_datebase.db'),
         onCreate: (db, version) {
       return db.execute(
@@ -39,7 +42,6 @@ class DatabaseDietRepository {
   _initDailyRecords() async {
     await _connectIfNot();
     final date = Date.now().toString();
-    await _connectIfNot();
     for (var food in DietFood.fullList) {
       var newRecord = DietRecord(date, food.name, 0);
       await _insert(newRecord);
@@ -62,7 +64,6 @@ class DatabaseDietRepository {
       listOfMap = await _db!
           .query("diet", where: "date = ?", whereArgs: [date.toString()]);
     }
-    print(listOfMap);
     var res = <DietRecord>[];
     for (var map in listOfMap) {
       res.add(DietRecord.fromMap(map));
@@ -129,5 +130,16 @@ class DatabaseDietRepository {
       res[food] = sum ~/ count;
     }
     return res;
+  }
+
+  Future<int> meanPercentOfWeek(Date oneDateInWeek) async {
+    var percents = await totalPercentThroughWeek(oneDateInWeek);
+    if (percents.isEmpty) {
+      return 0;
+    }
+    return percents.entries
+            .map((e) => e.value)
+            .reduce((value, element) => value + element) ~/
+        percents.length;
   }
 }

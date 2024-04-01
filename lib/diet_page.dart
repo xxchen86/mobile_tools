@@ -83,6 +83,7 @@ class _DietStatisticBodyState extends State<DietStatisticBody> {
   var _todayTotalPercent = 0;
   var _weekTotalPercent = <int, int>{};
   var _foodMeanPercent = <DietFood, int>{};
+  var _meanPercentWeek = 0;
 
   _DietStatisticBodyState() {
     var db = DatabaseDietRepository();
@@ -95,6 +96,9 @@ class _DietStatisticBodyState extends State<DietStatisticBody> {
         }));
     db.percentOfFoodThroughWeek(today).then((value) => setState(() {
           _foodMeanPercent = value;
+        }));
+    db.meanPercentOfWeek(today).then((value) => setState(() {
+          _meanPercentWeek = value;
         }));
   }
 
@@ -117,6 +121,7 @@ class _DietStatisticBodyState extends State<DietStatisticBody> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text("今日达成情况：$_todayTotalPercent%"),
+          Text("本周达成情况：$_meanPercentWeek%"),
         ]
             .followedBy(_weekTotalPercent.entries
                 .map((e) => Text("周${e.key}达成情况：${e.value}%")))

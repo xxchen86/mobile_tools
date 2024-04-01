@@ -25,7 +25,6 @@ class DietModel extends ChangeNotifier {
   }
 
   _updateDateRecords() {
-    print("change to $_date");
     _records.clear();
     _repository.getRecords(_date).then((records) {
       for (var record in records) {
