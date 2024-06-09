@@ -27,6 +27,7 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
   final TextEditingController _dayController = TextEditingController();
+  final TextEditingController _customDaysController = TextEditingController();
   final FocusNode _yearFocus = FocusNode();
   final FocusNode _monthFocus = FocusNode();
   final FocusNode _dayFocus = FocusNode();
@@ -71,31 +72,35 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
     }
   }
 
+  void _inputDateOver(String value) {
+    final year = int.tryParse(_yearController.text);
+    final month = int.tryParse(_monthController.text);
+    final day = int.tryParse(value);
+
+    if (year == null || month == null || day == null) {
+      _yearController.clear();
+      _yearFocus.requestFocus();
+      setState(() {
+        _expiryMessage = '请输入有效的日期';
+      });
+      return;
+    }
+
+    if (!_isValidDate(year, month, day)) {
+      _yearController.clear();
+      _yearFocus.requestFocus();
+      setState(() {
+        _expiryMessage = '请输入有效的日期';
+      });
+      return;
+    }
+
+    _dayFocus.unfocus();
+  }
+
   void _onDayChanged(String value) {
     if (value.length == 2) {
-      final year = int.tryParse(_yearController.text);
-      final month = int.tryParse(_monthController.text);
-      final day = int.tryParse(value);
-
-      if (year == null || month == null || day == null) {
-        _yearController.clear();
-        _yearFocus.requestFocus();
-        setState(() {
-          _expiryMessage = '请输入有效的日期';
-        });
-        return;
-      }
-
-      if (!_isValidDate(year, month, day)) {
-        _yearController.clear();
-        _yearFocus.requestFocus();
-        setState(() {
-          _expiryMessage = '请输入有效的日期';
-        });
-        return;
-      }
-
-      _dayFocus.unfocus();
+      _inputDateOver(value);
     }
   }
 
@@ -104,9 +109,22 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
       final dateString = '$year-$month-$day';
       final formatter = DateFormat('yyyy-MM-dd');
       final parsedDate = formatter.parseStrict(dateString);
-      return parsedDate.year == year && parsedDate.month == month && parsedDate.day == day;
+      return parsedDate.year == year &&
+          parsedDate.month == month &&
+          parsedDate.day == day;
     } catch (e) {
       return false;
+    }
+  }
+
+  void _calculateCustomExpiry() {
+    final customDays = int.tryParse(_customDaysController.text);
+    if (customDays != null && customDays > 0) {
+      _calculateExpiry(customDays);
+    } else {
+      setState(() {
+        _expiryMessage = '请输入有效的天数';
+      });
     }
   }
 
@@ -129,6 +147,10 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
                   maxLength: 4,
                   onChanged: _onYearChanged,
                   onTap: () => _yearController.clear(),
+                  onSubmitted: (v) {
+                    _monthController.clear();
+                    _monthFocus.requestFocus();
+                  },
                 ),
               ),
               SizedBox(width: 8.0),
@@ -148,6 +170,10 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
                   maxLength: 2,
                   onChanged: _onMonthChanged,
                   onTap: () => _monthController.clear(),
+                  onSubmitted: (v) {
+                    _dayController.clear();
+                    _dayFocus.requestFocus();
+                  },
                 ),
               ),
               SizedBox(width: 8.0),
@@ -167,6 +193,10 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
                   maxLength: 2,
                   onChanged: _onDayChanged,
                   onTap: () => _dayController.clear(),
+                  onSubmitted: (v) {
+                    _dayFocus.unfocus();
+                    _inputDateOver(_dayController.text);
+                  },
                 ),
               ),
             ],
@@ -190,6 +220,36 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
               ElevatedButton(
                 onPressed: () => _calculateExpiry(240),
                 child: Text('240天'),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Expanded(
+                child: TextFormField(
+                  controller: _customDaysController,
+                  decoration: InputDecoration(
+                    labelText: '自定义天数',
+                  ),
+                  keyboardType: TextInputType.number,
+                  maxLength: 3,
+                  onChanged: (value) {
+                    setState(() {
+                      _expiryMessage = '';
+                    });
+                  },
+                  onFieldSubmitted: (value) {
+                    _calculateCustomExpiry();
+                  },
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _calculateCustomExpiry();
+                },
+                child: Text('计算'),
               ),
             ],
           ),
