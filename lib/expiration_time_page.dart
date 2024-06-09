@@ -73,7 +73,40 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
 
   void _onDayChanged(String value) {
     if (value.length == 2) {
+      final year = int.tryParse(_yearController.text);
+      final month = int.tryParse(_monthController.text);
+      final day = int.tryParse(value);
+
+      if (year == null || month == null || day == null) {
+        _yearController.clear();
+        _yearFocus.requestFocus();
+        setState(() {
+          _expiryMessage = '请输入有效的日期';
+        });
+        return;
+      }
+
+      if (!_isValidDate(year, month, day)) {
+        _yearController.clear();
+        _yearFocus.requestFocus();
+        setState(() {
+          _expiryMessage = '请输入有效的日期';
+        });
+        return;
+      }
+
       _dayFocus.unfocus();
+    }
+  }
+
+  bool _isValidDate(int year, int month, int day) {
+    try {
+      final dateString = '$year-$month-$day';
+      final formatter = DateFormat('yyyy-MM-dd');
+      final parsedDate = formatter.parseStrict(dateString);
+      return parsedDate.year == year && parsedDate.month == month && parsedDate.day == day;
+    } catch (e) {
+      return false;
     }
   }
 
