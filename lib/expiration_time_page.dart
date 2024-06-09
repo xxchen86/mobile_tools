@@ -23,6 +23,11 @@ class FoodExpiryForm extends StatefulWidget {
   _FoodExpiryFormState createState() => _FoodExpiryFormState();
 }
 
+enum ExpiryType {
+  Date,
+  Month,
+}
+
 class _FoodExpiryFormState extends State<FoodExpiryForm> {
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
@@ -31,6 +36,7 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
   final FocusNode _yearFocus = FocusNode();
   final FocusNode _monthFocus = FocusNode();
   final FocusNode _dayFocus = FocusNode();
+  ExpiryType _expiryType = ExpiryType.Date; // 默认选择日期输入
   String _expiryMessage = '';
 
   void _calculateExpiry(int days) {
@@ -118,7 +124,15 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
   }
 
   void _calculateCustomExpiry() {
-    final customDays = int.tryParse(_customDaysController.text);
+    late int? customDays;
+    if (_expiryType == ExpiryType.Date) {
+      customDays = int.tryParse(_customDaysController.text);
+    } else {
+      customDays = int.tryParse(_customDaysController.text);
+      if (customDays != null) {
+        customDays *= 30;
+      }
+    }
     if (customDays != null && customDays > 0) {
       _calculateExpiry(customDays);
     } else {
@@ -202,8 +216,8 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
             ],
           ),
           SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          Wrap(
+            spacing: 8.0,
             children: <Widget>[
               ElevatedButton(
                 onPressed: () => _calculateExpiry(30),
@@ -211,15 +225,19 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
               ),
               ElevatedButton(
                 onPressed: () => _calculateExpiry(120),
-                child: Text('120天'),
+                child: Text('120天/4个月'),
               ),
               ElevatedButton(
                 onPressed: () => _calculateExpiry(180),
-                child: Text('180天'),
+                child: Text('180天/6个月'),
               ),
               ElevatedButton(
                 onPressed: () => _calculateExpiry(240),
-                child: Text('240天'),
+                child: Text('240天/8个月'),
+              ),
+              ElevatedButton(
+                onPressed: () => _calculateExpiry(18 * 30),
+                child: Text('18个月'),
               ),
             ],
           ),
@@ -231,7 +249,7 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
                 child: TextFormField(
                   controller: _customDaysController,
                   decoration: InputDecoration(
-                    labelText: '自定义天数',
+                    labelText: '自定义保质期',
                   ),
                   keyboardType: TextInputType.number,
                   maxLength: 3,
@@ -245,6 +263,28 @@ class _FoodExpiryFormState extends State<FoodExpiryForm> {
                   },
                 ),
               ),
+              SizedBox(width: 8.0),
+              DropdownButton<ExpiryType>(
+                value: _expiryType,
+                onChanged: (value) {
+                  setState(() {
+                    if (value != null) {
+                      _expiryType = value;
+                    }
+                  });
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: ExpiryType.Date,
+                    child: Text('日'),
+                  ),
+                  DropdownMenuItem(
+                    value: ExpiryType.Month,
+                    child: Text('月'),
+                  ),
+                ],
+              ),
+              SizedBox(width: 8.0),
               ElevatedButton(
                 onPressed: () {
                   _calculateCustomExpiry();
